@@ -55,11 +55,11 @@ DIFS = {
     },
     0b0110: {
         "desc": "Integer/binär, 48 Bit",
-        "length": 5
+        "length": 6
     },
     0b0111: {
         "desc": "Integer/binär, 64 Bit",
-        "length": 6
+        "length": 8
     },
     0b1000: {
         "desc": "Selektion für Auslesen",
