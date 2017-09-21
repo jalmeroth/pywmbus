@@ -44,7 +44,7 @@ def sans_checksum(data):
         )
 
         if csum_calc != csum_data:
-            raise "Checksum {} mismatch".format(i)
+            raise WMBusChecksumError("Checksum {} mismatch".format(i))
 
         new_data += data[start:end]
     # last 2 bytes are a checksum too
