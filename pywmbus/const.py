@@ -119,6 +119,12 @@ VIFS = {
     },
     0b1111101: {
         "desc": "Zweite Erweiterung der VIF-Codes"
+    },
+    0b1010101: {
+        "desc": "Massestrom: 10(nnn−3) kg/h"
+    },
+    0b1111010: {
+        "desc": "Adresse"
     }
 }
 
