@@ -16,6 +16,9 @@ _LOGGER = logging.getLogger(__name__)
 
 def parse(data):
     """Parse wM-Bus Frame"""
+    if data.startswith('b'):
+        data = data[1:]
+
     try:
         data = bytearray().fromhex(data)
     except ValueError as err:
