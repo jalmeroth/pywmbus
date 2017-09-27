@@ -51,7 +51,7 @@ def main():
     parser.add_argument(
         '-d', '--debug', type=int, help='Enable debug mode')
     parser.add_argument(
-        '-r', '--raw', type=str, help='RAW Message')
+        '-r', '--raw', action="append", type=str, help='RAW Message')
     parser.add_argument(
         '-s', '--serial', type=str, help='Path to serial device')
     parser.add_argument(
@@ -73,7 +73,8 @@ def main():
                 parse(data[1:])
             time.sleep(1)
     elif args.raw:
-        parse(args.raw)
+        for raw in args.raw:
+            parse(raw)
     else:
         parser.print_usage()
 
