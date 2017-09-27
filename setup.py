@@ -89,6 +89,7 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     platforms=['any'],
+    scripts=['parser.py'],
     # $ setup.py publish support.
     cmdclass={
         'upload': UploadCommand,
