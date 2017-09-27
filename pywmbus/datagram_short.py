@@ -24,6 +24,7 @@ def sans_checksum(data):
     remainder = body_len % 16
     times = int((body_len - remainder) / 16)
     times += 1 if remainder > 0 else 0
+    # +1 for header crc, +1 for L-field
     full_len = ((times + 1) * csum_len) + data[0] + 1
 
     _LOGGER.debug("%d: %d, %d = %d", len(data), times, remainder, full_len)

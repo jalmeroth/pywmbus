@@ -125,6 +125,9 @@ VIFS = {
     },
     0b1111010: {
         "desc": "Adresse"
+    },
+    0b0111101: {
+        "desc": "Durchflussmenge: 10(nnn−6) m3/h"
     }
 }
 
