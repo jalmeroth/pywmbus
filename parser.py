@@ -28,7 +28,7 @@ def parse(data):
 
     if data:
         telegram = pywmbus.parse(data)
-        print("manufacturer: {}".format(telegram.manufacturer))
+        print("\nmanufacturer: {}".format(telegram.manufacturer))
         print("device id: {}".format(telegram.device_id))
         print("device version: {}".format(telegram.device_version))
         print("device type: {}".format(telegram.device_type))
@@ -39,7 +39,6 @@ def parse(data):
             print("configuration: {}".format(telegram.configuration))
             print("records ({}): {}".format(
                 len(telegram.records), telegram.records))
-        print()
 
 
 def main():

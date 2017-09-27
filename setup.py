@@ -23,7 +23,7 @@ REQUIRED = [
 here = os.path.abspath(os.path.dirname(__file__))
 
 # Import the README and use it as the long-description.
-with open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
+with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = '\n' + f.read()
 
 # Load the package's __version__.py module as a dictionary.
@@ -73,6 +73,7 @@ setup(
     version=about['__version__'],
     description=DESCRIPTION,
     long_description=long_description,
+    long_description_content_type="text/markdown; charset=UTF-8",
     author=AUTHOR,
     author_email=EMAIL,
     url=URL,
@@ -87,6 +88,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
     ],
+    platforms=['any'],
     # $ setup.py publish support.
     cmdclass={
         'upload': UploadCommand,
