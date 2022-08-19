@@ -71,8 +71,8 @@ def sans_checksum(data):
 
 class ShortDatagram(Datagram):
     """docstring for ShortDatagram"""
-    def __init__(self, data, *args, **kwargs):
-        super(ShortDatagram, self).__init__(data, *args, **kwargs)
+    def __init__(self, data, checksums_present, *args, **kwargs):
+        super(ShortDatagram, self).__init__(data, checksums_present, *args, **kwargs)
 
         self.data['_acc_field'] = DatagramField(ACC_FIELD, data[13:14])
         self.data['_state_field'] = DatagramField(STATE_FIELD, data[14:15])

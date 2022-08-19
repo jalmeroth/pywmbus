@@ -15,7 +15,7 @@ _CRC_16 = crcmod.predefined.mkCrcFun("crc-16-en-13757")
 
 class Datagram(object):
     """docstring for Datagram"""
-    def __init__(self, data, *args, **kwargs):
+    def __init__(self, data, checksums_present, *args, **kwargs):
         super(Datagram, self).__init__()
         _LOGGER.debug("Unused arguments: %s / %s", args, kwargs)
         self._data = {
@@ -28,23 +28,32 @@ class Datagram(object):
         self.data['_a_field_id'] = DatagramField(ID_FIELD, data[4:8])
         self.data['_a_field_version'] = DatagramField(A_FIELD, data[8:9])
         self.data['_a_field_type'] = DatagramField(A_FIELD, data[9:10])
-        self.data['_crc'].append(DatagramField(CRC_FIELD, data[10:12]))
 
-        if self.data['_c_field'].field_value == 0xc4:
-            # Data in between 12:32 is still unknown
-            _LOGGER.info("This type of Datagram is experimental")
-            self.data['_ci_field'] = DatagramField(CI_FIELD, data[32:33])
+        if checksums_present:
+            self.data['_crc'].append(DatagramField(CRC_FIELD, data[10:12]))
+
+            if self.data['_c_field'].field_value == 0xc4:
+                # Data in between 12:32 is still unknown
+                _LOGGER.info("This type of Datagram is experimental")
+                self.data['_ci_field'] = DatagramField(CI_FIELD, data[32:33])
+            else:
+                self.data['_ci_field'] = DatagramField(CI_FIELD, data[12:13])
+
+            if self.data['_crc'][0].field_value != _CRC_16(data[0:10]):
+                raise WMBusChecksumError("Checksum 0 mismatch")
         else:
-            self.data['_ci_field'] = DatagramField(CI_FIELD, data[12:13])
-
-        if self.data['_crc'][0].field_value != _CRC_16(data[0:10]):
-            raise WMBusChecksumError("Checksum 0 mismatch")
+            if self.data['_c_field'].field_value == 0xc4:
+                # Data in between 12:32 is still unknown
+                _LOGGER.info("This type of Datagram is experimental")
+                self.data['_ci_field'] = DatagramField(CI_FIELD, data[30:31])
+            else:
+                self.data['_ci_field'] = DatagramField(CI_FIELD, data[10:11])
 
     @staticmethod
     def parse(data):
         """Parse data and return Datagram object"""
         _LOGGER.debug("parsing data: %s", data)
-        return Datagram(data)
+        return Datagram(data, True)
 
     @property
     def is_headless(self):
