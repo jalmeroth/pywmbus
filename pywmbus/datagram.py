@@ -15,7 +15,7 @@ _CRC_16 = crcmod.predefined.mkCrcFun("crc-16-en-13757")
 
 class Datagram(object):
     """docstring for Datagram"""
-    def __init__(self, data, *args, **kwargs):
+    def __init__(self, data, checksums_present, *args, **kwargs):
         super(Datagram, self).__init__()
         _LOGGER.debug("Unused arguments: %s / %s", args, kwargs)
         self._data = {
@@ -28,23 +28,27 @@ class Datagram(object):
         self.data['_a_field_id'] = DatagramField(ID_FIELD, data[4:8])
         self.data['_a_field_version'] = DatagramField(A_FIELD, data[8:9])
         self.data['_a_field_type'] = DatagramField(A_FIELD, data[9:10])
-        self.data['_crc'].append(DatagramField(CRC_FIELD, data[10:12]))
+
+        if checksums_present:
+            self.data['_crc'].append(DatagramField(CRC_FIELD, data[10:12]))
+
+        crc_offset = 2 if checksums_present else 0
 
         if self.data['_c_field'].field_value == 0xc4:
-            # Data in between 12:32 is still unknown
+            # Data in between 12:32 (10:30 if crc stripped) is still unknown
             _LOGGER.info("This type of Datagram is experimental")
-            self.data['_ci_field'] = DatagramField(CI_FIELD, data[32:33])
+            self.data['_ci_field'] = DatagramField(CI_FIELD, data[30 + crc_offset:31 + crc_offset])
         else:
-            self.data['_ci_field'] = DatagramField(CI_FIELD, data[12:13])
+            self.data['_ci_field'] = DatagramField(CI_FIELD, data[10 + crc_offset:11 + crc_offset])
 
-        if self.data['_crc'][0].field_value != _CRC_16(data[0:10]):
+        if self.data['_crc'].__len__() > 0 and self.data['_crc'][0].field_value != _CRC_16(data[0:10]):
             raise WMBusChecksumError("Checksum 0 mismatch")
 
     @staticmethod
-    def parse(data):
+    def parse(data, checksums_present):
         """Parse data and return Datagram object"""
         _LOGGER.debug("parsing data: %s", data)
-        return Datagram(data)
+        return Datagram(data, checksums_present)
 
     @property
     def is_headless(self):
@@ -73,12 +77,12 @@ class Datagram(object):
 
     @property
     def data(self):
-        """Return data attribut"""
+        """Return data attribute"""
         return self._data
 
     @data.setter
     def data(self, data):
-        """Set data attribut"""
+        """Set data attribute"""
         _LOGGER.debug("set data: %s", data)
         self._data = data
 
@@ -108,7 +112,7 @@ class Datagram(object):
         return "{0}{1}{2}".format(
             chr(((self.data.get('_m_field').field_value >> 10) & 0x001F) + 64),
             chr(((self.data.get('_m_field').field_value >> 5) & 0x001F) + 64),
-            chr(((self.data.get('_m_field').field_value) & 0x001F) + 64)
+            chr((self.data.get('_m_field').field_value & 0x001F) + 64)
         )
 
     def __repr__(self):

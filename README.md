@@ -23,13 +23,16 @@ Currently, there is support for unencrypted short frames (namely CI 0x7a) only. 
 
 ## Usage
 
-    usage: parser.py [-h] [-d DEBUG] [-r RAW] [-s SERIAL] [-b BAUD]
+    usage: parser.py [-h] [-d DEBUG] [-r RAW] [--crc] [--no-crc] [-s SERIAL]
+                     [-b BAUD]
     
     optional arguments:
       -h, --help            show this help message and exit
       -d DEBUG, --debug DEBUG
                             Enable debug mode
       -r RAW, --raw RAW     RAW Message
+      --crc                 CRC checksums present in raw msg
+      --no-crc              CRC checksums stripped from the raw msg
       -s SERIAL, --serial SERIAL
                             Path to serial device
       -b BAUD, --baud BAUD  Baudrate

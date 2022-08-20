@@ -14,7 +14,7 @@ logging.basicConfig(
 _LOGGER = logging.getLogger(__name__)
 
 
-def parse(data):
+def parse(data, crc_sums_present):
     """Parse wM-Bus Frame"""
     if data.startswith('b'):
         data = data[1:]
@@ -27,7 +27,7 @@ def parse(data):
         data = None
 
     if data:
-        telegram = pywmbus.parse(data)
+        telegram = pywmbus.parse(data, crc_sums_present)
         print("\nmanufacturer: {}".format(telegram.manufacturer))
         print("device id: {}".format(telegram.device_id))
         print("device version: {}".format(telegram.device_version))
@@ -52,6 +52,11 @@ def main():
     parser.add_argument(
         '-r', '--raw', action="append", type=str, help='RAW Message')
     parser.add_argument(
+        '--crc', action='store_true', help='CRC checksums present in raw msg')
+    parser.add_argument(
+        '--no-crc', dest='crc', action='store_false', help='CRC checksums stripped from the raw msg')
+    parser.set_defaults(crc=True)
+    parser.add_argument(
         '-s', '--serial', type=str, help='Path to serial device')
     parser.add_argument(
         '-b', '--baud', default=9600, type=int, help='Baudrate')
@@ -69,11 +74,11 @@ def main():
         while True:
             data = device.read()
             if data and data.startswith('b'):
-                parse(data[1:])
+                parse(data[1:], args.crc)
             time.sleep(1)
     elif args.raw:
         for raw in args.raw:
-            parse(raw)
+            parse(raw, args.crc)
     else:
         parser.print_usage()
 

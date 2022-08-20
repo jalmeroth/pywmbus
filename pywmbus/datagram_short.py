@@ -71,14 +71,16 @@ def sans_checksum(data):
 
 class ShortDatagram(Datagram):
     """docstring for ShortDatagram"""
-    def __init__(self, data, *args, **kwargs):
-        super(ShortDatagram, self).__init__(data, *args, **kwargs)
+    def __init__(self, data, checksums_present, *args, **kwargs):
+        super(ShortDatagram, self).__init__(data, checksums_present, *args, **kwargs)
 
-        self.data['_acc_field'] = DatagramField(ACC_FIELD, data[13:14])
-        self.data['_state_field'] = DatagramField(STATE_FIELD, data[14:15])
-        self.data['_conf_field'] = DatagramField(CONF_FIELD, data[15:17])
+        crc_offset = 2 if checksums_present else 0
 
-        self._new_data = sans_checksum(data)
+        self.data['_acc_field'] = DatagramField(ACC_FIELD, data[11 + crc_offset:12 + crc_offset])
+        self.data['_state_field'] = DatagramField(STATE_FIELD, data[12 + crc_offset:13 + crc_offset])
+        self.data['_conf_field'] = DatagramField(CONF_FIELD, data[13 + crc_offset:15 + crc_offset])
+
+        self._new_data = sans_checksum(data) if checksums_present else data[1:]
 
         self.records = []
         remaining = self._new_data[14:]
@@ -94,8 +96,8 @@ class ShortDatagram(Datagram):
                 remaining = record.record_data_remaining
 
     @staticmethod
-    def parse(data):
-        return ShortDatagram(data)
+    def parse(data, checksums_present):
+        return ShortDatagram(data, checksums_present)
 
     @property
     def state(self):
