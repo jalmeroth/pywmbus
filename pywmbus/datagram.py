@@ -29,17 +29,17 @@ class Datagram(object):
         self.data['_a_field_version'] = DatagramField(A_FIELD, data[8:9])
         self.data['_a_field_type'] = DatagramField(A_FIELD, data[9:10])
 
-        crc_size = 0
         if checksums_present:
             self.data['_crc'].append(DatagramField(CRC_FIELD, data[10:12]))
-            crc_size = 2
+
+        crc_offset = 2 if checksums_present else 0
 
         if self.data['_c_field'].field_value == 0xc4:
             # Data in between 12:32 (10:30 if crc stripped) is still unknown
             _LOGGER.info("This type of Datagram is experimental")
-            self.data['_ci_field'] = DatagramField(CI_FIELD, data[30 + crc_size:31 + crc_size])
+            self.data['_ci_field'] = DatagramField(CI_FIELD, data[30 + crc_offset:31 + crc_offset])
         else:
-            self.data['_ci_field'] = DatagramField(CI_FIELD, data[10 + crc_size:11 + crc_size])
+            self.data['_ci_field'] = DatagramField(CI_FIELD, data[10 + crc_offset:11 + crc_offset])
 
         if self.data['_crc'].__len__() > 0 and self.data['_crc'][0].field_value != _CRC_16(data[0:10]):
             raise WMBusChecksumError("Checksum 0 mismatch")
