@@ -94,8 +94,8 @@ class ShortDatagram(Datagram):
                 remaining = record.record_data_remaining
 
     @staticmethod
-    def parse(data):
-        return ShortDatagram(data)
+    def parse(data, checksums_present):
+        return ShortDatagram(data, checksums_present)
 
     @property
     def state(self):

@@ -50,10 +50,10 @@ class Datagram(object):
                 self.data['_ci_field'] = DatagramField(CI_FIELD, data[10:11])
 
     @staticmethod
-    def parse(data):
+    def parse(data, checksums_present):
         """Parse data and return Datagram object"""
         _LOGGER.debug("parsing data: %s", data)
-        return Datagram(data, True)
+        return Datagram(data, checksums_present)
 
     @property
     def is_headless(self):
@@ -117,7 +117,7 @@ class Datagram(object):
         return "{0}{1}{2}".format(
             chr(((self.data.get('_m_field').field_value >> 10) & 0x001F) + 64),
             chr(((self.data.get('_m_field').field_value >> 5) & 0x001F) + 64),
-            chr(((self.data.get('_m_field').field_value) & 0x001F) + 64)
+            chr((self.data.get('_m_field').field_value & 0x001F) + 64)
         )
 
     def __repr__(self):
