@@ -35,13 +35,12 @@ class Datagram(object):
             crc_size = 2
 
         if self.data['_c_field'].field_value == 0xc4:
-            # Data in between 12:32 is still unknown
+            # Data in between 12:32 (10:30 if crc stripped) is still unknown
             _LOGGER.info("This type of Datagram is experimental")
-            self.data['_ci_field'] = DatagramField(CI_FIELD,
-                                                   data[30 + crc_size:31 + crc_size])
+            self.data['_ci_field'] = DatagramField(CI_FIELD, data[30 + crc_size:31 + crc_size])
         else:
-            self.data['_ci_field'] = DatagramField(CI_FIELD,
-                                                   data[10 + crc_size:11 + crc_size])
+            self.data['_ci_field'] = DatagramField(CI_FIELD, data[10 + crc_size:11 + crc_size])
+
         if self.data['_crc'].__len__() > 0 and self.data['_crc'][0].field_value != _CRC_16(data[0:10]):
             raise WMBusChecksumError("Checksum 0 mismatch")
 
@@ -78,12 +77,12 @@ class Datagram(object):
 
     @property
     def data(self):
-        """Return data attribut"""
+        """Return data attribute"""
         return self._data
 
     @data.setter
     def data(self, data):
-        """Set data attribut"""
+        """Set data attribute"""
         _LOGGER.debug("set data: %s", data)
         self._data = data
 
